@@ -240,7 +240,8 @@ int main(int argc, char *argv[])
 	scalar maxDeltaT 		= readMaxDeltaT(runTime);
 	scalar maxAcousticCo 	= readMaxAcousticCo(runTime);
 
-    //#include "createFields.H"
+
+    // Creating Fields
 	Info<< "Reading field p_rgh\n" << endl;
 	volScalarField p_rgh
 	(
@@ -390,17 +391,32 @@ int main(int argc, char *argv[])
     	scalar maxCo 			= readMaxCo(runTime);
     	scalar maxDeltaT 		= readMaxDeltaT(runTime);
     	scalar maxAcousticCo 	= readMaxAcousticCo(runTime);
+    	scalar maxAlphaCo(readScalar(runTime.controlDict().lookup("maxAlphaCo")));
 
     	// Calculate the Courant-Numbers
-    	scalar CoNum 			= calculateCoNumber(runTime, mesh, phi);
-    	scalar meanCoNum 		= calculateMeanCoNumber(runTime, mesh, phi);
-    	scalar acousticCoNum 	= calculateAcoustincCoNumber(runTime,mixture,mesh,phi);
-    	printCoNumbers(CoNum, meanCoNum, acousticCoNum);
+    	scalar CoNum 			= calculateCoNumber(runTime,
+    			mesh,
+				phi);
+    	scalar meanCoNum 		= calculateMeanCoNumber(runTime,
+    			mesh,
+				phi);
+    	scalar acousticCoNum 	= calculateAcoustincCoNumber(runTime,
+    			mixture,
+				mesh,
+				phi);
+    	printCoNumbers(CoNum,
+    			meanCoNum,
+				acousticCoNum);
 
-//        #include "alphaCourantNo.H"
-    	scalar maxAlphaCo(readScalar(runTime.controlDict().lookup("maxAlphaCo")));
-    	scalar alphaCoNum 		= calculateAlphaCoNum(mesh,mixture,phi,runTime);
-    	scalar meanAlphaCoNum 	= calculateMeanAlphaCoNum(mesh,mixture,phi,runTime);
+    	scalar alphaCoNum 		= calculateAlphaCoNum(mesh,
+    			mixture,
+				phi,
+				runTime);
+    	scalar meanAlphaCoNum 	= calculateMeanAlphaCoNum(mesh,
+    			mixture,
+				phi,
+				runTime);
+    	printAlphaCoNumbers(meanAlphaCoNum, alphaCoNum);
 
 		// Adjusting the time step based on the maximum Courant Numbers
     	if (adjustTimeStep)
