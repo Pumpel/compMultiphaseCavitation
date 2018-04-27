@@ -1,0 +1,70 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+}
+
+divSchemes
+{
+    div(rhoPhi,U)  Gauss GammaV 0.5 grad(U);
+    div(phi,alpha)  Gauss vanLeer grad(alpha);
+    div(phirb,alpha) Gauss linear;
+    "div\(phi,.*rho.*\)" Gauss Gamma 0.5 "grad\().*rho.*\)";
+    div(rhoPhi,T)  Gauss upwind;
+    div(rhoPhi,K)  Gauss upwind;
+/*    div(phi,p)      Gauss upwind;*/
+    div(phi,p)      Gauss Gamma 0.5 grad(p);
+// kepsilon
+    div(phi,nuTilda) bounded Gauss upwind; 
+    div(phi,k)      Gauss limitedLinear 1;
+    div(phi,omega)      Gauss limitedLinear 1;
+    div(phi,epsilon)      Gauss limitedLinear 1;
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+// kOmega model
+    div(rhoPhi,omega) Gauss limitedLinear 1;
+    div(phi,epsilon) Gauss limitedLinear 1;
+    div(rhoPhi,k) Gauss limitedLinear 1;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+wallDist
+{
+    method meshWave;
+}
+
+// ************************************************************************* //
