@@ -25,14 +25,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "MultiphaseCavitation.H"
-#include "multiphasePhaseChangeMixtureThermo/multiphasePhaseChangeMixtureThermo.H"
+#include "multiphaseCavitationMixture.H"
 #include "turbulentFluidThermoModel.H"
 #include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-scalar readAdjustTimeStep (Foam::Time& runTime)
+Foam::scalar readAdjustTimeStep (Foam::Time& runTime)
 {
 	scalar adjustTimeStep = runTime.controlDict().lookupOrDefault("adjustTimeStep", false);
 	return adjustTimeStep;
@@ -91,7 +90,7 @@ scalar calculateMeanCoNumber(Time& runTime,
 
 
 scalar calculateAcoustincCoNumber(Time& runTime,
-						multiphasePhaseChangeMixtureThermo& mixture,
+						multiphaseCavitationMixture& mixture,
 						fvMesh& mesh,
 						surfaceScalarField& phi)
 {
@@ -150,7 +149,7 @@ void setInitialExtendedDeltaT(bool adjustTimeStep,
 }
 
 scalar calculateAlphaCoNum(fvMesh& mesh,
-							Foam::multiphasePhaseChangeMixtureThermo& mixture,
+							Foam::multiphaseCavitationMixture& mixture,
 							surfaceScalarField& phi,
 							Time& runTime)
 {
@@ -170,7 +169,7 @@ scalar calculateAlphaCoNum(fvMesh& mesh,
 
 
 scalar calculateMeanAlphaCoNum(fvMesh& mesh,
-								Foam::multiphasePhaseChangeMixtureThermo& mixture,
+								Foam::multiphaseCavitationMixture& mixture,
 								surfaceScalarField& phi,
 								Time& runTime)
 {
@@ -196,7 +195,8 @@ void printAlphaCoNumbers(scalar meanAlphaCoNum, scalar alphaCoNum)
 
 int main(int argc, char *argv[])
 {
-    #include "postProcess.H"
+	// TODO Use the function calls instead of the #include files for postProcess.H
+    //#include "postProcess.H"
 
 	Foam::argList args(argc, argv);
 	if (!args.checkRootCase())
@@ -285,8 +285,8 @@ int main(int argc, char *argv[])
 	    fvc::flux(U)
 	);
 
-	Info<< "Constructing multiphasePhaseChangeMixtureThermo\n" << endl;
-	multiphasePhaseChangeMixtureThermo mixture(U, phi);
+	Info<< "Constructing multiphaseCavitationMixture\n" << endl;
+	multiphaseCavitationMixture mixture(U, phi);
 
 	volScalarField rho
 	(
@@ -552,7 +552,6 @@ int main(int argc, char *argv[])
             	    }
 
             	    //Coefficients of the mass transfer
-            	    //Info << "calling mixture.cavitationModel()->pSat() now \n";
             	    const dimensionedScalar pSat = mixture.cavitationModel()->pSat();
             	    volScalarField pSatField(
             								IOobject
@@ -569,17 +568,14 @@ int main(int argc, char *argv[])
             	    pSatField = mixture.cavitationModel()->pSat();
 
 
-            	    //Info << "calling mixture.cavitationModel()->vDotP() now \n";
             	    Pair<tmp<volScalarField>> vDotP = mixture.cavitationModel()->vDotP();
-            	    //Info << "vDotP[0]() = " << vDotP[0]() << "\n";
-            	    //Info << "vDotP[1]() = " << vDotP[1]() << "\n";
             	    const volScalarField& vDotcP = vDotP[0]();
             	    const volScalarField& vDotvP = vDotP[1]();
 
 
             	    // Cache p_rgh prior to solve for density update
             	    volScalarField p_rgh_0(p_rgh);
-            	//
+
             	    while (pimple.correctNonOrthogonal())
             	    {
 
