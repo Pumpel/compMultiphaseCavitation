@@ -1,0 +1,73 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+phases (water vapor);
+
+pSat            [1 -1 -2 0 0 0 0] 2337;   // Saturation pressure
+
+sigma           [1 0 -2 0 0 0 0] 0.07;
+
+// for cavNumber = 0.4
+pMin            [1 -1 -2 0 0 0 0] 2224.1875;//2268.09375; //cp = .41 -> 2224.1875
+
+sigmas
+(
+    (water vapor) 0.07
+);
+
+MultiphaseCavitation SchnerrSauer;
+
+// Surface tension coefficients
+sigma12           sigma12 [1 0 -2 0 0 0 0] 0.05;
+sigma13           sigma13 [1 0 -2 0 0 0 0] 0.04;
+
+// Bensow paper
+KunzCoeffs
+{
+    UInf            UInf   [0 1 -1 0 0 0 0]     13;
+    tInf            tInf   [0 0 1 0 0 0 0]      0.00196899224; // L = 0.0245 m
+    Cc              Cc     [0 0 0 0 0 0 0]      1e3;
+    Cv              Cv     [0 0 0 0 0 0 0]      2e4;
+}
+
+VentilatedKunzCoeffs
+{
+    UInf            UInf   [0 1 -1 0 0 0 0]     10.0;
+    tInf            tInf   [0 0 1 0 0 0 0]      0.005; // L = 0.1 m
+    Cc              Cc     [0 0 0 0 0 0 0]      1000;
+    Cv              Cv     [0 0 0 0 0 0 0]      1000;
+}
+
+MerkleCoeffs
+{
+    UInf            UInf   [0 1 -1 0 0 0 0]     10.0;
+    tInf            tInf   [0 0 1 0 0 0 0]      0.005;  // L = 0.1 m
+    Cc              Cc     [0 0 0 0 0 0 0]      80;
+    Cv              Cv     [0 0 0 0 0 0 0]      1e-03;
+}
+
+SchnerrSauerCoeffs
+{
+    n               n      [0 -3 0 0 0 0 0]     1.6e+13;
+    dNuc            dNuc   [0 1 0 0 0 0 0]      2.0e-06;
+    Cc              Cc     [0 0 0 0 0 0 0]      1;
+    Cv              Cv     [0 0 0 0 0 0 0]      1;
+}
+
+
+
+// ************************************************************************* //

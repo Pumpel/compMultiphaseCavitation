@@ -1,6 +1,6 @@
 EXE_INC = \
 	-I/ \
-    -ImultiphasePhaseChangeMixtureThermo/lnInclude \
+    -ImultiphaseCavitationMixture/lnInclude \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/transportModels/twoPhaseMixture/lnInclude \
@@ -11,7 +11,7 @@ EXE_INC = \
     -I$(LIB_SRC)/meshTools/lnInclude
 
 EXE_LIBS = \
-    -lmultiphasePhaseChangeMixtureThermo \
+    -lmultiphaseCavitationMixture \
     -lcompressibleTransportModels \
     -lfluidThermophysicalModels \
     -lspecie \

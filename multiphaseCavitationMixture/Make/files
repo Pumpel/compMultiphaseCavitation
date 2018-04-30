@@ -1,0 +1,13 @@
+phaseModel/phaseModel.C
+alphaContactAngle/alphaContactAngleFvPatchScalarField.C
+
+multiphaseCavitationModels/MultiphaseCavitation.C
+multiphaseCavitationModels/newMultiphaseCavitation.C
+
+multiphaseCavitationModels/Kunz/Kunz.C
+multiphaseCavitationModels/SchnerrSauer/SchnerrSauer.C
+
+multiphaseCavitationMixture.C
+
+
+LIB = $(FOAM_LIBBIN)/libmultiphaseCavitationMixture

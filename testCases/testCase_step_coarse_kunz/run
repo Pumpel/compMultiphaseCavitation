@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application=`getApplication`
+
+rm -v log.*
+
+echo "rm -r processor*"
+rm -r processor*
+echo "rm -r 0.0*"
+#rm -r 0.0*
+#cp -rv 0*.orig/ 0.000
+#rm 0.0*/Phi
+rm log.decomposePar
+runApplication decomposePar -latestTime
+echo "mpirun -np 4 $application -parallel > log.run1"
+mpirun -np 4 $application -parallel > log.run1
+
+runApplication reconstructPar -newTimes
+rm log.reconstructPar
+#------------------------------------------------------------------------------
