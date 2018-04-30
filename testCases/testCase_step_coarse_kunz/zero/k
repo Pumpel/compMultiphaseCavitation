@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      k;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+
+// Source https://www.researchgate.net/post/Should_the_RANS_model_kOmegaSST_be_fully_resolved_at_low_Re-number_Is_it_possible_to_use_it_with_a_wall_function
+
+
+internalField   uniform 0.00214816642040328;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 0.00214816642040328;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+    lowerWall
+    {
+        type            kqRWallFunction;
+        value           $internalField;
+/*        type            fixedValue;*/
+/*        value           uniform 1e-40;*/
+    }
+    upperWall
+    {
+        type            kqRWallFunction;
+        value           $internalField;
+/*        type            fixedValue;*/
+/*        value           uniform 1e-40;*/
+    }
+    BOTTOM
+    {
+        type            fixedValue;
+        value           uniform 0.035914136678014956;
+    }
+    
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //

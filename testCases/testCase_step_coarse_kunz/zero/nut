@@ -1,0 +1,79 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      nut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -1 0 0 0 0];
+
+// Source https://www.researchgate.net/post/Should_the_RANS_model_kOmegaSST_be_fully_resolved_at_low_Re-number_Is_it_possible_to_use_it_with_a_wall_function
+//4 m/s
+// nut = k/omega = 0.013666990997336186 /3.049142959472961 = 0.00448224015
+//10 m/s
+// nut = k/omega = 0.007685513828806602 / 0.22865346487356009 = 0.03361205933
+
+
+// nut = k/omega
+//nut =0.00017770212;
+
+
+
+internalField   uniform 0.00017770212;
+
+boundaryField
+{
+
+    inlet
+    {
+        type              calculated;
+        value             uniform 0.00017770212;
+        //type            freestream;
+        //freestreamValue uniform 0.14;
+        //freestreamValue 0.013666990997336186
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+        //type            freestream;
+        //freestreamValue uniform 0.14;
+        //freestreamValue 0.013666990997336186
+    }
+    lowerWall
+    {
+       type            nutkWallFunction;
+       value           uniform 0;
+/*       type             calculated;*/
+/*       value            uniform 0;*/
+    }
+    upperWall
+    {
+       type            nutkWallFunction;
+       value           uniform 0;
+/*       type             calculated;*/
+/*       value            uniform 0;*/
+    }
+    BOTTOM
+    {
+        type              calculated;
+        value             uniform 0.00072659329;
+    }
+    
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
