@@ -1,0 +1,51 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Web:      www.OpenFOAM.org
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Writes graph data for specified fields along a line, specified by start
+    and end points.
+
+\*---------------------------------------------------------------------------*/
+
+//Try 1
+//start (0.01  0.025 0); 
+//end     (0.01 -0.025 0); 
+
+
+//Try 2
+//Assumption: 0,0,0 is at the bottom
+//Result: values for alpha.water are all 1 -> only for the mid-     to top section of the small diameter the case
+//start   (0 0.013 0);
+//end     (-0.04 0.013 0);
+
+//Try 3
+//Assumption: 0,0,0 is at the edge
+//start   (0 0.00075 0);
+//end     (-0.04 0.00075 0); 
+
+//start   (0 0.000375 0);
+//end     (-0.04 0.000375 0); 
+
+start   (0.01 0.002 0.0);
+end     (-0.3 0.002 0.0);
+
+fields  (U);
+//fields  (U);
+//fields  (p);
+//fields  (p_rgh);
+// Sampling and I/O settings
+#includeEtc "caseDicts/postProcessing/graphs/sampleDict.cfg"
+
+// Override settings here, e.g.
+setConfig { type midPoint; 
+            axis x; 
+}
+
+// Must be last entry
+#includeEtc "caseDicts/postProcessing/graphs/graph.cfg"
+
+// ************************************************************************* //

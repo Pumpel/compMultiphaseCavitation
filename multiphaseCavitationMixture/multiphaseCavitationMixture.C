@@ -71,13 +71,11 @@ Foam::multiphaseCavitationMixture::multiphaseCavitationMixture
 )
 :
     psiThermo(U.mesh(), word::null),
-
     phases_(lookup("phases"), phaseModel::iNew(p_, T_)),
-
     mesh_(U.mesh()),
     U_(U),
     phi_(phi),
-
+	pMin_(lookup("pMin")),
     rhoPhi_
     (
         IOobject
@@ -91,7 +89,6 @@ Foam::multiphaseCavitationMixture::multiphaseCavitationMixture
         mesh_,
         dimensionedScalar("rhoPhi", dimMass/dimTime, 0.0)
     ),
-
     alphas_
     (
         IOobject
@@ -118,7 +115,6 @@ Foam::multiphaseCavitationMixture::multiphaseCavitationMixture
         mesh_,
         dimensionedScalar("alphaSum_", dimless, 0.0)
     ),
-
     sigmas_(lookup("sigmas")),
     dimSigma_(1, 0, -2, 0, 0),
     deltaN_
@@ -189,30 +185,7 @@ void Foam::multiphaseCavitationMixture::correct()
 
 void Foam::multiphaseCavitationMixture::correctRho(const volScalarField& dp)
 {
-	// Implementing minimum rho value. Otherwise, negative densities are allowed
-//	dimensionedScalar minDensity("minDensity", dimDensity, 0.0001);
-//	// Ensuring the minimal density
-//	if (phasei().thermo().rho()[celli] < minDensity.value())
-//	{
-//		phasei().thermo().rho()[celli] = minDensity.value();
-//	}
-
-    // TODO read the pMin value from the thermophysicalDict
-//    this->cavitationModel()->pMin();
-//
-//    IOdictionary thermophyPropertiesDict(
-//										IOobject
-//										(
-//											"thermophysicalProperties",
-//											U.time().constant(),
-//											U.db(),
-//											IOobject::MUST_READ_IF_MODIFIED,
-//											IOobject::NO_WRITE
-//										));
-
-
-	//dimensionedScalar pMin("pMin", dimPressure, 2224.1875);
-	scalar pMin(2224.1875);
+	scalar& pMin = pMin_.value();
     const volScalarField& p = U_.db().lookupObject<volScalarField>("p");
 
     // Apply the density correction only, if the minimum pressure

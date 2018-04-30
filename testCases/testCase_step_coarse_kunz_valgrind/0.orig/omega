@@ -1,0 +1,88 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      epsilon;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 -1 0 0 0 0];
+
+// Source https://www.researchgate.net/post/Should_the_RANS_model_kOmegaSST_be_fully_resolved_at_low_Re-number_Is_it_possible_to_use_it_with_a_wall_function
+//4 m/s
+//internalField   uniform 3.049142959472961;//9.80;
+//10 m/s
+//internalField   uniform 0.22865346487356009;
+//17.6 m/s
+//internalField   uniform 54.24841251190004;
+
+internalField   uniform 12.088580152170941;
+
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 12.088580152170941;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+    lowerWall
+    {
+       //High Re model: Wall function approach for omega
+       //Wall function even for low Re flow required, see
+        // https://www.cfd-online.com/Forums/openfoam/97520-why-menters-sst-model-low-re-issue-has-not-been-seriously-investigated.html
+       type            omegaWallFunction;
+       // Value is only for initialization, no influence on the simulation after first convergence
+       value           $internalField;
+
+       // Low Re model:
+        // https://www.cfd-online.com/Forums/openfoam/97520-why-menters-sst-model-low-re-issue-has-not-been-seriously-investigated.html
+        //Not using wall functions for omega (k and nut same as above):
+
+        //omega
+        //type fixedValue;
+        //value uniform (calculated with Menter's recommended wall BC, i. e. omegawall=60*nu/(beta*y^2), with nu=kinematic viscosity at the wall, 
+        //beta=0.075 and y=normal distance between the first fluid node and the nearest wall);
+
+        
+/*        type        fixedValue;*/
+/*                            // check this value*/
+/*                            //9.7937E-7  *60 / (0.075 * (0.0001*0.245)**2)*/
+/*        value       uniform 1305282.798833819;*/
+    }
+    upperWall
+    {
+/*        type            fixedValue;*/
+/*        value           uniform 49.4281149703772;*/
+       type            omegaWallFunction;
+       // Value is only for initialization, no influence on the simulation after first convergence
+       value           $internalField;
+    }
+    BOTTOM
+    {
+        type            fixedValue;
+        value           uniform 49.4281149703772;
+    }
+    
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //

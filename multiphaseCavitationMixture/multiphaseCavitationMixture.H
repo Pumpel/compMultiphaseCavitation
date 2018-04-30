@@ -137,8 +137,8 @@ private:
         const volVectorField& U_;
         const surfaceScalarField& phi_;
 
+        dimensionedScalar pMin_;
         surfaceScalarField rhoPhi_;
-
         volScalarField alphas_;
         volScalarField alphaSum_;
 
