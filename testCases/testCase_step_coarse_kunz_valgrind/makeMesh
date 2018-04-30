@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+cp -v /media/timo/linuxSimData/geometry/rectangle_2D/rectangle.msh ./
+
+rm -v log.gmshToFoam
+runApplication gmshToFoam rectangle.msh
+:

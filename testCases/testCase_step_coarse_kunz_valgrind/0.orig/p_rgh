@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      p_rgh;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -2 0 0];
+
+internalField    uniform 101000; //4337
+
+boundaryField
+{
+    inlet
+    {
+        type            zeroGradient;
+        //type            fixedFluxPressure;
+/*        type            waveTransmissive;*/
+/*        psi             thermo:psi;*/
+/*        gamma           1;*/
+/*        fieldInf        60000;*/
+/*        lInf            0.5;*/
+/*        value           $internalField;*/
+        type            uniformFixedValue;
+        uniformValue     table
+                                (
+                                    (0       101000)
+                                    (0.075   101000)
+                                    (0.085   14000)
+                                );
+    }
+
+    outlet
+    {
+/*        type            waveTransmissive;*/
+/*        psi             thermo:psi;*/
+/*        gamma           1;*/
+/*        fieldInf        4337;*/
+/*        lInf            1;*/
+/*        value           $internalField;*/
+        type            fixedValue;
+        value           uniform 14000;
+    }
+
+    upperWall
+    {
+        type            zeroGradient;
+    }
+
+    lowerWall
+    {
+        type            zeroGradient;
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
