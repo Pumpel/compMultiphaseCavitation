@@ -189,30 +189,9 @@ void Foam::multiphaseCavitationMixture::correct()
 
 void Foam::multiphaseCavitationMixture::correctRho(const volScalarField& dp)
 {
-	// Implementing minimum rho value. Otherwise, negative densities are allowed
-//	dimensionedScalar minDensity("minDensity", dimDensity, 0.0001);
-//	// Ensuring the minimal density
-//	if (phasei().thermo().rho()[celli] < minDensity.value())
-//	{
-//		phasei().thermo().rho()[celli] = minDensity.value();
-//	}
-
-    // TODO read the pMin value from the thermophysicalDict
-//    this->cavitationModel()->pMin();
-//
-//    IOdictionary thermophyPropertiesDict(
-//										IOobject
-//										(
-//											"thermophysicalProperties",
-//											U.time().constant(),
-//											U.db(),
-//											IOobject::MUST_READ_IF_MODIFIED,
-//											IOobject::NO_WRITE
-//										));
-
-
 	//dimensionedScalar pMin("pMin", dimPressure, 2224.1875);
-	scalar pMin(2224.1875);
+	//scalar pMin(2224.1875);
+	scalar pMin = U_.db().lookupObject<scalar>("pMin");
     const volScalarField& p = U_.db().lookupObject<volScalarField>("p");
 
     // Apply the density correction only, if the minimum pressure

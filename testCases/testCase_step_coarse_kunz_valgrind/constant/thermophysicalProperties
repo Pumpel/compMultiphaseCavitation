@@ -21,6 +21,10 @@ pSat            [1 -1 -2 0 0 0 0] 2337;   // Saturation pressure
 
 sigma           [1 0 -2 0 0 0 0] 0.07;
 
+// pMin is set for a cavNumber = 0.4 with pSat = 2337
+// For this solver to make sense, the pMin value has to be chosen such, that the 
+// negative pressure coefficient of the vapor phase is equal to the expected
+// cavitation number
 pMin            [1 -1 -2 0 0 0 0] 200;
 
 sigmas
