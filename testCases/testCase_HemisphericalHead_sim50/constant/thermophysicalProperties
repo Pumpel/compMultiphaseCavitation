@@ -25,7 +25,7 @@ sigma           [1 0 -2 0 0 0 0] 0.07;
 // For this solver to make sense, the pMin value has to be chosen such, that the 
 // negative pressure coefficient of the vapor phase is equal to the expected
 // cavitation number
-pMin            [1 -1 -2 0 0 0 0] 2224.1875;//2268.09375; //cp = .41 -> 2224.1875
+pMin    pMin    [1 -1 -2 0 0 0 0] 2224.1875;//2268.09375; //cp = .41 -> 2224.1875
 
 sigmas
 (

@@ -1,3 +1,5 @@
+Utilities.C
+
 compMultiphaseCavitation.C
 
 EXE = $(FOAM_APPBIN)/compMultiphaseCavitation
