@@ -156,8 +156,7 @@ scalar Utilities::calculateAlphaCoNum(
 				mixture.nearInterface()().primitiveField()
 						* fvc::surfaceSum(mag(phi))().primitiveField());
 
-		alphaCoNum = 0.5
-				* gMax(sumPhi / mesh.V().field())
+		alphaCoNum = 0.5 * gMax(sumPhi / mesh.V().field())
 				* runTime.deltaTValue();
 	}
 	return alphaCoNum;
