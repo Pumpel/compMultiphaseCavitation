@@ -6,7 +6,6 @@ CreateSolverFields::CreateSolverFields(	const Time& runTime,
 										multiphaseCavitationMixture& mixture) :
 		runTime_(runTime),
 				mesh_(mesh),
-				mixture_(mixture),
 				p_rgh_(
 						IOobject(
 								"p_rgh",
@@ -40,6 +39,7 @@ CreateSolverFields::CreateSolverFields(	const Time& runTime,
 								IOobject::AUTO_WRITE),
 						mixture.rho()),
 				pMin_(dimensionedScalar("pMin", dimPressure, mixture_)),
+				mixture_(multiphaseCavitationMixture(U_, phi_)),
 				g_(
 						IOobject(
 								"g",
@@ -101,6 +101,11 @@ dimensionedScalar& Foam::CreateSolverFields::pMin()
 	return pMin_;
 }
 
+multiphaseCavitationMixture& Foam::CreateSolverFields::mixture()
+{
+	return mixture_;
+}
+
 uniformDimensionedVectorField& Foam::CreateSolverFields::g()
 {
 	return g_;
@@ -130,6 +135,7 @@ volScalarField& Foam::CreateSolverFields::K()
 {
 	return K_;
 }
+
 ///*
 // * CreateSolverFields.C
 // *
