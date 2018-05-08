@@ -1,4 +1,6 @@
 Utilities.C
+Equations.C
+CreateSolverFields.C
 
 compMultiphaseCavitation.C
 
