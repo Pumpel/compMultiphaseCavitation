@@ -2,8 +2,7 @@
 #include "CreateSolverFields.H"
 
 CreateSolverFields::CreateSolverFields(	const Time& runTime,
-										const fvMesh& mesh,
-										multiphaseCavitationMixture& mixture) :
+										const fvMesh& mesh) :
 		runTime_(runTime),
 				mesh_(mesh),
 				p_rgh_(
@@ -30,6 +29,7 @@ CreateSolverFields::CreateSolverFields(	const Time& runTime,
 								IOobject::READ_IF_PRESENT,
 								IOobject::AUTO_WRITE),
 						fvc::flux(U_)),
+				mixture_(multiphaseCavitationMixture(U_, phi_)),
 				rho_(
 						IOobject(
 								"rho",
@@ -37,9 +37,8 @@ CreateSolverFields::CreateSolverFields(	const Time& runTime,
 								mesh,
 								IOobject::READ_IF_PRESENT,
 								IOobject::AUTO_WRITE),
-						mixture.rho()),
+						mixture_.rho()),
 				pMin_(dimensionedScalar("pMin", dimPressure, mixture_)),
-				mixture_(multiphaseCavitationMixture(U_, phi_)),
 				g_(
 						IOobject(
 								"g",

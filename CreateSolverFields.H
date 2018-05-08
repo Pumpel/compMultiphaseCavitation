@@ -22,12 +22,15 @@ private:
 	volScalarField p_rgh_;
 	volVectorField U_;
 	surfaceScalarField phi_;
-	volScalarField rho_;
-	dimensionedScalar pMin_;
 
 	// The multiphaseCavitationMixture is responsible for solvingthe phase
 	// equations and handling all phase specific tasks
 	multiphaseCavitationMixture mixture_;
+
+	// The density field used by the solver. This is the mixture density as
+	// calculated by the multiphaseCavitationMixture
+	volScalarField rho_;
+	dimensionedScalar pMin_;
 
 	uniformDimensionedVectorField g_;
 	uniformDimensionedScalarField hRef_;
@@ -39,8 +42,7 @@ private:
 
 public:
 	CreateSolverFields(	const Time& runTime,
-						const fvMesh& mesh,
-						multiphaseCavitationMixture& mixture);
+						const fvMesh& mesh);
 
 	// Disallow copy construct
 	CreateSolverFields(const Foam::CreateSolverFields& createFields) = delete;

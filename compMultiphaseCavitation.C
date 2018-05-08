@@ -27,8 +27,12 @@ License
 #include "fvCFD.H"
 #include "turbulentFluidThermoModel.H"
 #include "pimpleControl.H"
+
+// Specific includes written for this solver, to write proper object
+// oriented code
 #include "multiphaseCavitationMixture.H"
 #include "Utilities.H"
+#include "CreateSolverFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -83,6 +87,7 @@ int main(int argc, char *argv[])
 	scalar maxDeltaT 		= util.readMaxDeltaT(runTime);
 	scalar maxAcousticCo 	= util.readMaxAcousticCo(runTime);
 
+	CreateSolverFields solverFields(runTime, mesh);
 
 	// Creating Fields
 	Info<< "Reading field p_rgh\n" << endl;
