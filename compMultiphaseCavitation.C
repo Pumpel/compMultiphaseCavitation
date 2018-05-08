@@ -60,14 +60,12 @@ int main(int argc, char *argv[])
 			<< Foam::nl
 			<< Foam::endl;
 
-	Foam::fvMesh mesh
-	(
+	Foam::fvMesh mesh(
 			Foam::IOobject(
 					Foam::fvMesh::defaultRegion,
 					runTime.timeName(),
 					runTime,
-					Foam::IOobject::MUST_READ)
-	);
+					Foam::IOobject::MUST_READ));
 
 	// Create Control
 	#if defined(NO_CONTROL)
@@ -88,55 +86,47 @@ int main(int argc, char *argv[])
 
 	// Creating Fields
 	Info<< "Reading field p_rgh\n" << endl;
-	volScalarField p_rgh
-	(
+	volScalarField p_rgh(
 			IOobject(
 					"p_rgh",
 					runTime.timeName(),
 					mesh,
 					IOobject::MUST_READ,
 					IOobject::AUTO_WRITE),
-			mesh
-	);
+			mesh);
 
 	Info<< "Reading field U\n" << endl;
-	volVectorField U
-	(
+	volVectorField U(
 			IOobject(
 					"U",
 					runTime.timeName(),
 					mesh,
 					IOobject::MUST_READ,
 					IOobject::AUTO_WRITE),
-			mesh
-	);
+			mesh);
 
 	// Creates and initialises the relative face-flux field phi.
 	Info<< "Reading/calculating face flux field phi\n" << endl;
-	surfaceScalarField phi
-	(
+	surfaceScalarField phi(
 			IOobject(
 					"phi",
 					runTime.timeName(),
 					mesh,
 					IOobject::READ_IF_PRESENT,
 					IOobject::AUTO_WRITE),
-			fvc::flux(U)
-	);
+			fvc::flux(U));
 
 	Info<< "Constructing multiphaseCavitationMixture\n" << endl;
 	multiphaseCavitationMixture mixture(U, phi);
 
-	volScalarField rho
-	(
+	volScalarField rho(
 			IOobject(
 					"rho",
 					runTime.timeName(),
 					mesh,
 					IOobject::READ_IF_PRESENT,
 					IOobject::AUTO_WRITE),
-			mixture.rho()
-	);
+			mixture.rho());
 
 	dimensionedScalar pMin("pMin", dimPressure, mixture);
 
@@ -164,44 +154,43 @@ int main(int argc, char *argv[])
 
 	Info << "Calculating field g.h\n" << endl;
 	dimensionedScalar ghRef(
-			mag(g.value()) > SMALL ?
-										g & (cmptMag(g.value()) / mag(g.value())) * hRef :
-										dimensionedScalar(
-												"ghRef",
-												g.dimensions() * dimLength,
-												0));
+			mag(g.value()) > SMALL ? g & (cmptMag(g.value()) / mag(g.value())) * hRef :
+					dimensionedScalar("ghRef", g.dimensions() * dimLength, 0));
 	volScalarField gh("gh", (g & mesh.C()) - ghRef);
 	surfaceScalarField ghf("ghf", (g & mesh.Cf()) - ghRef);
 
 	// Construct compressible turbulence model
-	autoPtr<compressible::turbulenceModel> turbulence
-	(
+	autoPtr<compressible::turbulenceModel> turbulence(
 			compressible::turbulenceModel::New(
 					rho,
 					U,
 					mixture.rhoPhi(),
-					mixture)
-	);
+					mixture));
 
 	Info<< "Creating field kinetic energy K\n" << endl;
 	volScalarField K("K", 0.5*magSqr(U));
 
 
 	// Calculate the Courant-Numbers
-	scalar CoNum 			= util.calculateCoNumber(runTime, mesh, phi);
-	scalar meanCoNum 		= util.calculateMeanCoNumber(runTime, mesh, phi);
-	scalar acousticCoNum 	= util.calculateAcoustincCoNumber(runTime,mixture,mesh,phi);
+	scalar CoNum = util.calculateCoNumber(runTime, mesh, phi);
+	scalar meanCoNum = util.calculateMeanCoNumber(runTime, mesh, phi);
+	scalar acousticCoNum = util.calculateAcoustincCoNumber(
+			runTime,
+			mixture,
+			mesh,
+			phi);
 	util.printCoNumbers(CoNum, meanCoNum, acousticCoNum);
 
 	// Setting the first time step deltaT. Here, the extendend version for
 	// compressible flow is used.
-	util.setInitialExtendedDeltaT(adjustTimeStep,
-								CoNum,
-								maxCo,
-								maxAcousticCo,
-								acousticCoNum,
-								runTime,
-								maxDeltaT);
+	util.setInitialExtendedDeltaT(
+			adjustTimeStep,
+			CoNum,
+			maxCo,
+			maxAcousticCo,
+			acousticCoNum,
+			runTime,
+			maxDeltaT);
 
 	volScalarField& p = mixture.p();
 	volScalarField& T = mixture.T();
@@ -219,45 +208,31 @@ int main(int argc, char *argv[])
 				runTime);
 		scalar maxCo = util.readMaxCo(runTime);
 		scalar maxDeltaT = util.readMaxDeltaT(runTime);
-		scalar maxAcousticCo = util.readMaxAcousticCo(
-				runTime);
+		scalar maxAcousticCo = util.readMaxAcousticCo(runTime);
 		scalar maxAlphaCo(
 				readScalar(runTime.controlDict().lookup("maxAlphaCo")));
 
 		// Calculate the Courant-Numbers
-		scalar CoNum = util.calculateCoNumber(
-				runTime,
-				mesh,
-				phi);
-		scalar meanCoNum = util.calculateMeanCoNumber(
-				runTime,
-				mesh,
-				phi);
-		scalar acousticCoNum = util
-				.calculateAcoustincCoNumber(
+		scalar CoNum = util.calculateCoNumber(runTime, mesh, phi);
+		scalar meanCoNum = util.calculateMeanCoNumber(runTime, mesh, phi);
+		scalar acousticCoNum = util.calculateAcoustincCoNumber(
 				runTime,
 				mixture,
 				mesh,
 				phi);
-		util.printCoNumbers(
-				CoNum,
-				meanCoNum,
-				acousticCoNum);
+		util.printCoNumbers(CoNum, meanCoNum, acousticCoNum);
 
 		scalar alphaCoNum = util.calculateAlphaCoNum(
 				mesh,
 				mixture,
 				phi,
 				runTime);
-		scalar meanAlphaCoNum =
-				util.calculateMeanAlphaCoNum(
-						mesh,
-						mixture,
-						phi,
-						runTime);
-		util.printAlphaCoNumbers(
-				meanAlphaCoNum,
-				alphaCoNum);
+		scalar meanAlphaCoNum = util.calculateMeanAlphaCoNum(
+				mesh,
+				mixture,
+				phi,
+				runTime);
+		util.printAlphaCoNumbers(meanAlphaCoNum, alphaCoNum);
 
 		// Adjusting the time step based on the maximum Courant Numbers
 		if (adjustTimeStep)
@@ -289,9 +264,10 @@ int main(int argc, char *argv[])
 
 			// The momentum equation
 			fvVectorMatrix UEqn(
-					fvm::ddt(rho, U) + fvm::div(mixture.rhoPhi(), U) - fvm::Sp(
-							fvc::ddt(rho) + fvc::div(mixture.rhoPhi()),
-							U) + turbulence->divDevRhoReff(U));
+					fvm::ddt(rho, U) + fvm::div(mixture.rhoPhi(), U)
+							- fvm::Sp(
+									fvc::ddt(rho) + fvc::div(mixture.rhoPhi()),
+									U) + turbulence->divDevRhoReff(U));
 
 			UEqn.relax();
 
@@ -299,8 +275,10 @@ int main(int argc, char *argv[])
 			{
 				solve(
 						UEqn == fvc::reconstruct(
-								(mixture.surfaceTensionForce() - ghf * fvc::snGrad(
-										rho) - fvc::snGrad(p_rgh)) * mesh.magSf()));
+										(mixture.surfaceTensionForce()
+												- ghf * fvc::snGrad(rho)
+												- fvc::snGrad(p_rgh))
+												* mesh.magSf()));
 
 				K = 0.5 * magSqr(U);
 			}
@@ -309,14 +287,12 @@ int main(int argc, char *argv[])
 			{
 				fvScalarMatrix TEqn(
 						fvm::ddt(rho, T) + fvm::div(mixture.rhoPhi(), T)
-								- fvm::laplacian(
-										mixture.alphaEff(turbulence->mut()),
-										T)
-								+ (fvc::div(fvc::absolute(phi, U), p)
-										+ fvc::ddt(rho, K)
-										+ fvc::div(mixture.rhoPhi(), K))
-										* mixture
-								.rCv());
+						- fvm::laplacian(
+								mixture.alphaEff(turbulence->mut()),
+								T)
+						+ (fvc::div(fvc::absolute(phi, U), p) + fvc::ddt(rho, K)
+							+ fvc::div(mixture.rhoPhi(), K))
+							* mixture.rCv());
 
 				TEqn.relax();
 				TEqn.solve();
@@ -335,11 +311,8 @@ int main(int argc, char *argv[])
 							constrainHbyA(rAU * UEqn.H(), U, p_rgh));
 					surfaceScalarField phiHbyA(
 							"phiHbyA",
-							fvc::flux(HbyA)
-									+ fvc::interpolate(rho * rAU)
-											* fvc::ddtCorr(
-									U,
-									phi));
+							fvc::flux(HbyA) + fvc::interpolate(rho * rAU)
+									* fvc::ddtCorr(U, phi));
 
 					surfaceScalarField phig(
 							(mixture.surfaceTensionForce() - ghf * fvc::snGrad(
@@ -445,8 +418,7 @@ int main(int argc, char *argv[])
 
 						solve(
 								p_rghEqnComp + p_rghEqnIncomp,
-								mesh.solver(
-										p_rgh.select(pimple.finalInnerIter())));
+								mesh.solver(p_rgh.select(pimple.finalInnerIter())));
 
 						if (pimple.finalNonOrthogonalIter())
 						{
@@ -464,8 +436,10 @@ int main(int argc, char *argv[])
 
 							phi = phiHbyA + p_rghEqnIncomp.flux();
 
-							U = HbyA + rAU * fvc::reconstruct(
-									(phig + p_rghEqnIncomp.flux()) / rAUf);
+							U = HbyA
+									+ rAU
+									* fvc::reconstruct(
+											(phig + p_rghEqnIncomp.flux()) / rAUf);
 							U.correctBoundaryConditions();
 						}
 
