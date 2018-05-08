@@ -87,82 +87,38 @@ int main(int argc, char *argv[])
 	scalar maxDeltaT 		= util.readMaxDeltaT(runTime);
 	scalar maxAcousticCo 	= util.readMaxAcousticCo(runTime);
 
-	CreateSolverFields solverFields(runTime, mesh);
+	// Initializing all fields of this sovler
+	CreateSolverFields fields(runTime, mesh);
 
 	// Creating Fields
 	Info<< "Reading field p_rgh\n" << endl;
-	volScalarField p_rgh(
-			IOobject(
-					"p_rgh",
-					runTime.timeName(),
-					mesh,
-					IOobject::MUST_READ,
-					IOobject::AUTO_WRITE),
-			mesh);
+	volScalarField& p_rgh = fields.p_rgh();
 
 	Info<< "Reading field U\n" << endl;
-	volVectorField U(
-			IOobject(
-					"U",
-					runTime.timeName(),
-					mesh,
-					IOobject::MUST_READ,
-					IOobject::AUTO_WRITE),
-			mesh);
+	volVectorField& U = fields.U();
 
 	// Creates and initialises the relative face-flux field phi.
 	Info<< "Reading/calculating face flux field phi\n" << endl;
-	surfaceScalarField phi(
-			IOobject(
-					"phi",
-					runTime.timeName(),
-					mesh,
-					IOobject::READ_IF_PRESENT,
-					IOobject::AUTO_WRITE),
-			fvc::flux(U));
+	surfaceScalarField& phi = fields.phi();
 
-	Info<< "Constructing multiphaseCavitationMixture\n" << endl;
-	multiphaseCavitationMixture mixture(U, phi);
+	Info << "Constructing multiphaseCavitationMixture\n" << endl;
+	multiphaseCavitationMixture& mixture = fields.mixture();
 
-	volScalarField rho(
-			IOobject(
-					"rho",
-					runTime.timeName(),
-					mesh,
-					IOobject::READ_IF_PRESENT,
-					IOobject::AUTO_WRITE),
-			mixture.rho());
-
-	dimensionedScalar pMin("pMin", dimPressure, mixture);
-
+	volScalarField& rho = fields.rho();
+	dimensionedScalar& pMin = fields.pMin();
 	mesh.setFluxRequired(p_rgh.name());
 
 	// Reading the gravitational acceleration
-	Info << "\nReading g" << endl;
-	uniformDimensionedVectorField g(
-			IOobject(
-					"g",
-					runTime.constant(),
-					mesh,
-					IOobject::MUST_READ,
-					IOobject::NO_WRITE));
+//	Info << "\nReading g" << endl;
+//	uniformDimensionedVectorField& g = fields.g();
 
-	Info << "\nReading hRef" << endl;
-	uniformDimensionedScalarField hRef(
-			IOobject(
-					"hRef",
-					runTime.constant(),
-					mesh,
-					IOobject::READ_IF_PRESENT,
-					IOobject::NO_WRITE),
-			dimensionedScalar("hRef", dimLength, 0));
+//	Info << "\nReading hRef" << endl;
+//	uniformDimensionedScalarField& hRef = fields.hRef();
 
-	Info << "Calculating field g.h\n" << endl;
-	dimensionedScalar ghRef(
-			mag(g.value()) > SMALL ? g & (cmptMag(g.value()) / mag(g.value())) * hRef :
-					dimensionedScalar("ghRef", g.dimensions() * dimLength, 0));
-	volScalarField gh("gh", (g & mesh.C()) - ghRef);
-	surfaceScalarField ghf("ghf", (g & mesh.Cf()) - ghRef);
+//	Info << "Calculating field g.h\n" << endl;
+//	dimensionedScalar& ghRef = fields.ghRef();
+	volScalarField& gh = fields.gh();
+	surfaceScalarField& ghf = fields.ghf();
 
 	// Construct compressible turbulence model
 	autoPtr<compressible::turbulenceModel> turbulence(
@@ -173,7 +129,7 @@ int main(int argc, char *argv[])
 					mixture));
 
 	Info<< "Creating field kinetic energy K\n" << endl;
-	volScalarField K("K", 0.5*magSqr(U));
+	volScalarField& K = fields.K();
 
 
 	// Calculate the Courant-Numbers
@@ -239,7 +195,9 @@ int main(int argc, char *argv[])
 				runTime);
 		util.printAlphaCoNumbers(meanAlphaCoNum, alphaCoNum);
 
-		// Adjusting the time step based on the maximum Courant Numbers
+		// Adjusting the time step based on the maximum Courant Numbers before
+		// starting the time loop. This ensures stability of the first
+		// calcuation steps
 		if (adjustTimeStep)
 		{
 			scalar maxDeltaTFact = min(
@@ -267,7 +225,9 @@ int main(int argc, char *argv[])
 
 			solve(fvm::ddt(rho) + fvc::div(mixture.rhoPhi()));
 
+			// ---------------------------------------
 			// The momentum equation
+			// ---------------------------------------
 			fvVectorMatrix UEqn(
 					fvm::ddt(rho, U) + fvm::div(mixture.rhoPhi(), U)
 							- fvm::Sp(
@@ -288,8 +248,10 @@ int main(int argc, char *argv[])
 				K = 0.5 * magSqr(U);
 			}
 
+			// ---------------------------------------
 			// The temperature equation
-			{
+			// ---------------------------------------
+
 				fvScalarMatrix TEqn(
 						fvm::ddt(rho, T) + fvm::div(mixture.rhoPhi(), T)
 						- fvm::laplacian(
@@ -303,13 +265,13 @@ int main(int argc, char *argv[])
 				TEqn.solve();
 
 				mixture.correct();
-			}
+
 
 			// --- Pressure corrector loop
 			while (pimple.correct())
 			{
 				// The pressure equation
-				{
+
 					volScalarField rAU("rAU", 1.0 / UEqn.A());
 					surfaceScalarField rAUf("rAUf", fvc::interpolate(rAU));
 					volVectorField HbyA(
@@ -465,10 +427,10 @@ int main(int argc, char *argv[])
 
 					Info << "max(U) " << max(mag(U)).value() << endl;
 					Info << "min(p_rgh) " << min(p_rgh).value() << endl;
-				}
 
 
-			}
+
+			}    // end while(pimple.loop())
 
 			if (pimple.turbCorr())
 			{
